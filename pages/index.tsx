@@ -6,10 +6,10 @@ import { GetServerSideProps, NextPage } from 'next'
 import { SubgraphERC721Drop } from 'models/subgraph'
 import { GET_COLLECTIONS_QUERY, SUBGRAPH_URL } from 'constants/queries'
 import { ipfsImage, shortenAddress } from '@lib/helpers'
-import { collectionAddresses } from '@lib/constants'
 import { useAccount, useEnsName } from 'wagmi'
 import { Collection } from '@components/Collection'
 import {useCollectionMetadata} from '@hooks/useCollectionMetadata'
+import { getAllDropsForHome } from 'contentful/api'
 
 
 interface HomePageProps {
@@ -79,6 +79,11 @@ const HomePage: NextPage<HomePageProps> = ({ collections }) => {
 export default HomePage
 
 export const getServerSideProps: GetServerSideProps = async ({ res }) => {
+
+  // get drops from backend
+  const drops = await getAllDropsForHome({preview: false});
+  const collectionAddresses = drops.map((drop) => drop.contractAddress)
+
   const { erc721Drops } = await request(SUBGRAPH_URL, GET_COLLECTIONS_QUERY, {
     collectionAddresses: collectionAddresses,
   })

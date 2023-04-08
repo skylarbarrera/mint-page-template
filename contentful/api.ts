@@ -1,18 +1,35 @@
 const DROP_FIELDS = `
-slug
-title
-asset {
-  url
-}
-background { 
-  url
-}
-textColor
-backgroundColor
-titleColor
-contractAddress
-accentColor
+  slug
+  title
+  asset {
+    url
+  }
+  background { 
+    url
+  }
+  textColor
+  backgroundColor
+  titleColor
+  contractAddress
+  accentColor
 `
+
+interface Drop {
+  contractAddress: string
+  slug: string
+  title: string
+  asset: {
+      url: string
+  }
+  background: {
+    url: string
+}
+  titleColor: string
+  textColor: string
+  backgroundColor: string
+  accentColor: string
+  
+}
 
 
 
@@ -34,11 +51,11 @@ async function fetchGraphQL(query, preview = false) {
 
 
 
-function extractDrop(dropResponse){
+function extractDrop(dropResponse): Drop{
   return dropResponse?.data?.dropCollection?.items?.[0]
 }
 
-function extractDrops(dropResponse) {
+function extractDrops(dropResponse): Drop[] {
   return dropResponse?.data?.dropCollection?.items
 }
 
@@ -57,9 +74,7 @@ export async function getAllDropsWithSlug() {
 }
 
 
-export async function getAllDropsForHome(preview) {
-  console.log('process.env.CONTENTFUL_SPACE_ID', process.env.CONTENTFUL_SPACE_ID);
-  console.log('process.env.CONTENTFUL_ACCESS_TOKEN', process.env.CONTENTFUL_ACCESS_TOKEN);
+export async function getAllDropsForHome({preview}: {preview: boolean}) {
 
   const entries = await fetchGraphQL(
     `query {
@@ -71,13 +86,12 @@ export async function getAllDropsForHome(preview) {
     }`,
     preview
   )
-  console.log('res', entries)
   return extractDrops(entries)
 }
 
 
 export async function getPreviewDropSlug(slug) {
-  console.log('fetching drop')
+
   const entry = await fetchGraphQL(
     `query {
       dropCollection(where: { slug: "${slug}" }, limit: 1) {
@@ -87,14 +101,14 @@ export async function getPreviewDropSlug(slug) {
       }
     }`,
   )
-  console.log(entry);
+
   const drop = extractDrop(entry)
-  console.log(drop);
+
 
   return drop;
 }
 
-export async function getDropBySlug(slug, preview) {
+export async function getDropBySlug({slug, preview}: {slug: string | string[], preview: boolean}) {
   const entry = await fetchGraphQL(
     `query {
       dropCollection(where: { slug: "${slug}" }, preview: ${

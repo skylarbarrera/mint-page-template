@@ -10,7 +10,6 @@ import { GetServerSideProps, NextPage } from 'next'
 import { SubgraphERC721Drop } from 'models/subgraph'
 import { GET_COLLECTIONS_QUERY, SUBGRAPH_URL } from 'constants/queries'
 import { ipfsImage, shortenAddress } from '@lib/helpers'
-import { collectionAddresses } from '@lib/constants'
 import { useAccount, useEnsName } from 'wagmi'
 import { Collection } from '@components/Collection'
 import {useCollectionMetadata} from '@hooks/useCollectionMetadata'
@@ -87,11 +86,11 @@ export default HomePage
 
 
 export const getServerSideProps: GetServerSideProps = async ({ params, res }) => {
-  const data = await getDropBySlug(params.slug)
-  console.log(data);
+  
+    // get drop information from backend
+  const data = await getDropBySlug({slug: params.slug, preview: false})
 
-  console.log('data : ', [data.drop.contractAddress])
-  console.log(collectionAddresses)
+  // get zora drop info based on contract address 
   const { erc721Drops } = await request(SUBGRAPH_URL, GET_COLLECTIONS_QUERY, {
     collectionAddresses: [data.drop.contractAddress],
   })
