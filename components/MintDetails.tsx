@@ -15,12 +15,16 @@ interface MintDetailsProps extends StackProps {
   collection: ERC721DropProviderState
   hideToggle?: boolean
   initialOpen?: boolean
+  textColor?: string
+  accentColor?: string
 }
 
 export function MintDetails({
   collection,
   hideToggle,
   initialOpen = false,
+  textColor, 
+  accentColor,
   ...props
 }: MintDetailsProps) {
   const { address } = useAccount()
@@ -69,14 +73,14 @@ export function MintDetails({
         defaultOpen={hideToggle}
         onOpenChange={(value) => setOpened(value)}
       >
-        <Stack className="zord-mint-details" gap="x3">
-          <CollectionDetailsItem className="zord-mint-details__item" name="Number minted">
-            <Paragraph size="sm">
+        <Stack className="zord-mint-details" gap="x2" my="x5">
+          <CollectionDetailsItem className="zord-mint-details__item" name="Number minted" textColor={textColor}>
+            <Paragraph size="sm" style={{color: textColor}}>
               {formattedMintedCount}
               {collection.maxSupply > OPEN_EDITION_SIZE ? (
                 ' NFTs'
               ) : (
-                <Paragraph as="span" size="sm" color="tertiary">
+                <Paragraph as="span" size="sm" style={{color: textColor}}>
                   /{formattedTotalSupplyCount}
                 </Paragraph>
               )}
@@ -87,8 +91,9 @@ export function MintDetails({
             <CollectionDetailsItem
               className="zord-mint-details__item"
               name="Max per address"
+              textColor={textColor}
             >
-              <Text variant="paragraph-sm">
+              <Text variant="paragraph-sm" style={{color: textColor}}>
                 {/*userMintedCount && maxPerWallet < OPEN_EDITION_SIZE && (
                 <Box display="inline" color="tertiary">
                   {userMintedCount}/
@@ -106,6 +111,7 @@ export function MintDetails({
               <Stack gap="x3">
                 {!!(saleIsFinished || isSoldOut) && (
                   <CollectionDetailsItem
+                  textColor={textColor}
                     className="zord-mint-details__item"
                     name="Mint price"
                     value={
@@ -122,6 +128,7 @@ export function MintDetails({
                       className="zord-mint-details__item"
                       name="Presale start"
                       value={presaleStartDate.toLocaleString(...dateOptions)}
+                      textColor={textColor}
                     />
 
                     {!isNaN(presaleEndDate.getTime()) && (
@@ -129,6 +136,7 @@ export function MintDetails({
                         className="zord-mint-details__item"
                         name="Presale end"
                         value={presaleEndDate.toLocaleString(...dateOptions)}
+                        textColor={textColor}
                       />
                     )}
                   </>
@@ -140,6 +148,7 @@ export function MintDetails({
                   value={startDate.toLocaleString(
                     ...(dateOptions as [string, Intl.DateTimeFormatOptions])
                   )}
+                  textColor={textColor}
                 />
 
                 {!isNaN(endDate.getTime()) && (
@@ -147,6 +156,7 @@ export function MintDetails({
                     className="zord-mint-details__item"
                     name="Public sale end"
                     value={endDate.toLocaleString(...dateOptions)}
+                    textColor={textColor}
                   />
                 )}
               </Stack>

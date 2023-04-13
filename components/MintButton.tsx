@@ -18,6 +18,8 @@ export function MintButton({
   mintCounter = 1,
   availableMints,
   allowlistEntry,
+  textColor,
+  accentColor,
 }: {
   collection: ERC721DropProviderState
   isMinted: boolean
@@ -26,6 +28,8 @@ export function MintButton({
   mintCounter: number
   availableMints: number
   allowlistEntry?: AllowListEntry
+  textColor: string
+  accentColor: string
 }) {
   const { address } = useAccount()
   const { chain } = useNetwork()
@@ -71,16 +75,16 @@ export function MintButton({
   if (saleIsFinished || isSoldOut) {
     return (
       <Box>
-        <Heading textAlign="center" size="xs">
+        <Heading textAlign="center" size="xs" style={{color: textColor}}>
           {saleIsFinished ? 'Minting complete' : 'Sold out'}
         </Heading>
         <Paragraph
           mt="x1"
           textAlign="center"
           size="sm"
-          color="secondary"
           maxW="x64"
           mx="auto"
+          style={{color: textColor}}
         >
           There may be NFTs for sale on the secondary&nbsp;market.
         </Paragraph>
@@ -91,6 +95,7 @@ export function MintButton({
           rel="noreferrer"
           size="lg"
           my="x3"
+          style={{color: 'purple', backgroundColor: accentColor, borderRadius: 30}}
         >
           View on Opensea
         </Button>
@@ -119,7 +124,7 @@ export function MintButton({
         style={
           isMinted
             ? { backgroundColor: vars.color.positive, color: vars.color.onPositive }
-            : {}
+            : {backgroundColor: 'yellow', color: accentColor}
         }
         className={awaitingApproval ? waitingApproval : ''}
         disabled={

@@ -8,9 +8,13 @@ import { CollectionInner } from './CollectionInner'
 export function Collection({
   collection,
   username,
+  textColor,
+  accentColor
 }: {
   collection: SubgraphERC721Drop
   username?: string
+  textColor?: string
+  accentColor?: string
 }) {
 
   const components = {
@@ -34,7 +38,7 @@ export function Collection({
         collection={collection}
         metadataRendererAddress={collection.contractConfig.metadataRenderer}
       >
-        <CollectionInner username={username} />
+        <CollectionInner username={username} textColor={textColor} accentColor={accentColor}/>
       </MetadataProvider>
     </ERC721DropContractProvider>
   )

@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router'
 import ErrorPage from 'next/error'
-import { getAllDropsWithSlug, getDropBySlug } from '../../contentful/api'
+import { Drop, getAllDropsWithSlug, getDropBySlug } from '../../contentful/api'
 
 import request from 'graphql-request'
 import Head from 'next/head'
 import { useMemo } from 'react'
-import { Stack, Paragraph } from '@zoralabs/zord'
+import { Stack, Paragraph, ThemeProvider } from '@zoralabs/zord'
 import { GetServerSideProps, NextPage } from 'next'
 import { SubgraphERC721Drop } from 'models/subgraph'
 import { GET_COLLECTIONS_QUERY, SUBGRAPH_URL } from 'constants/queries'
@@ -16,19 +16,19 @@ import {useCollectionMetadata} from '@hooks/useCollectionMetadata'
 
 
 interface HomePageProps {
-  collections: SubgraphERC721Drop[]
+  drop: Drop & { collection: SubgraphERC721Drop}
 }
 
-const HomePage: NextPage<HomePageProps> = ({ collections }) => {
-  const { metadata } = useCollectionMetadata(collections[0].contractConfig.metadataRenderer)
-  const ogImage = ipfsImage(collections[0]?.editionMetadata?.imageURI)
+const HomePage: NextPage<HomePageProps> = ({ drop }) => {
+  const { metadata } = useCollectionMetadata(drop.collection.contractConfig.metadataRenderer)
+  const ogImage = ipfsImage(drop.collection?.editionMetadata?.imageURI)
   const { address } = useAccount()
   const { data: ensName } = useEnsName({
     address: address,
   })
   const username = useMemo(() => ensName || shortenAddress(address), [address, ensName])
 
-  if (!collections.length) {
+  if (!drop.collection) {
     return (
       <Paragraph py="x5" align="center">
         404, contract not found.
@@ -39,8 +39,8 @@ const HomePage: NextPage<HomePageProps> = ({ collections }) => {
   return (
     <>
       <Head>
-        <title>{collections[0].name}</title>
-        <meta name="title" content={`${collections[0].name}`} />
+        <title>{drop.collection.name}</title>
+        <meta name="title" content={`${drop.collection.name}`} />
         <meta
           name="description"
           content={
@@ -48,10 +48,10 @@ const HomePage: NextPage<HomePageProps> = ({ collections }) => {
             "ZORA's creator toolkit makes it easy to create an NFT collection, with tooling that scales with your creative ambitions"
           }
         />
-        <meta name="og:title" content={`${collections[0].name}`} />
+        <meta name="og:title" content={`${drop.collection.name}`} />
         <meta
           name="og:url"
-          content={`https://create.zora.co/editions/${collections[0].address}`}
+          content={`https://create.zora.co/editions/${drop.collection.address}`}
         />
         <meta
           name="og:description"
@@ -62,19 +62,35 @@ const HomePage: NextPage<HomePageProps> = ({ collections }) => {
         />
         <meta name="og:image" content={ogImage} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${collections[0].name}`} />
+        <meta name="twitter:title" content={`${drop.collection.name}`} />
         <meta
           name="twitter:url"
-          content={`https://create.zora.co/editions/${collections[0].address}`}
+          content={`https://create.zora.co/editions/${drop.collection.address}`}
         />
         <meta name="twitter:image" content={ogImage} />
       </Head>
 
+      {/*  Background Component */}
+      <div
+        style={{
+          background:
+            `radial-gradient(66.46% 100.48% at 50% 50%, ${drop.backgroundColor || '#270061'} 0%, #000000 100%)`,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          bottom: 0,
+          right: 0,
+          padding: 0,
+          margin: 0,
+          zIndex: -10,
+        }}
+      />
+
       <Stack align="center" minH="100vh">
-        {collections.map((collection) => (
-          <Collection key={collection.address} username={username} collection={collection} />
-        ))}
+
+          <Collection key={drop.collection.address} username={username} collection={drop.collection} accentColor={drop.accentColor} textColor={drop.textColor}/>
       </Stack>
+
     </>
   )
 }
@@ -90,10 +106,16 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
     // get drop information from backend
   const data = await getDropBySlug({slug: params.slug, preview: false})
 
+
   // get zora drop info based on contract address 
   const { erc721Drops } = await request(SUBGRAPH_URL, GET_COLLECTIONS_QUERY, {
     collectionAddresses: [data.drop.contractAddress],
   })
+
+  console.log({
+    ...data.drop, 
+    collection: erc721Drops[0]
+  });
 
   if (!erc721Drops.length) {
     res.statusCode = 404
@@ -101,7 +123,10 @@ export const getServerSideProps: GetServerSideProps = async ({ params, res }) =>
 
   return {
     props: {
-      collections: erc721Drops,
+      drop: {
+        ...data.drop, 
+        collection: erc721Drops[0]
+      },
     },
   }
 }

@@ -1,31 +1,32 @@
 import request from 'graphql-request'
 import Head from 'next/head'
 import { useMemo } from 'react'
-import { Stack, Paragraph } from '@zoralabs/zord'
+import { Paragraph, Grid } from '@zoralabs/zord'
 import { GetServerSideProps, NextPage } from 'next'
 import { SubgraphERC721Drop } from 'models/subgraph'
 import { GET_COLLECTIONS_QUERY, SUBGRAPH_URL } from 'constants/queries'
 import { ipfsImage, shortenAddress } from '@lib/helpers'
 import { useAccount, useEnsName } from 'wagmi'
-import { Collection } from '@components/Collection'
 import {useCollectionMetadata} from '@hooks/useCollectionMetadata'
-import { getAllDropsForHome } from 'contentful/api'
+import { Drop, getAllDropsForHome } from 'contentful/api'
+import { CollectionImageInner } from '@components/CollectionImageInner'
+import Link from 'next/link'
 
 
 interface HomePageProps {
-  collections: SubgraphERC721Drop[]
+  drops: Drop & {collection: SubgraphERC721Drop}[]
 }
 
-const HomePage: NextPage<HomePageProps> = ({ collections }) => {
-  const { metadata } = useCollectionMetadata(collections[0].contractConfig.metadataRenderer)
-  const ogImage = ipfsImage(collections[0]?.editionMetadata?.imageURI)
+const HomePage: NextPage<HomePageProps> = ({ drops }) => {
+  const { metadata } = useCollectionMetadata(drops[0].collection.contractConfig.metadataRenderer)
+  const ogImage = ipfsImage(drops[0].collection?.editionMetadata?.imageURI)
   const { address } = useAccount()
   const { data: ensName } = useEnsName({
     address: address,
   })
   const username = useMemo(() => ensName || shortenAddress(address), [address, ensName])
 
-  if (!collections.length) {
+  if (!drops.length) {
     return (
       <Paragraph py="x5" align="center">
         404, contract not found.
@@ -36,8 +37,8 @@ const HomePage: NextPage<HomePageProps> = ({ collections }) => {
   return (
     <>
       <Head>
-        <title>{collections[0].name}</title>
-        <meta name="title" content={`${collections[0].name}`} />
+        <title>{drops[0].collection.name}</title>
+        <meta name="title" content={`${drops[0].collection.name}`} />
         <meta
           name="description"
           content={
@@ -45,10 +46,10 @@ const HomePage: NextPage<HomePageProps> = ({ collections }) => {
             "ZORA's creator toolkit makes it easy to create an NFT collection, with tooling that scales with your creative ambitions"
           }
         />
-        <meta name="og:title" content={`${collections[0].name}`} />
+        <meta name="og:title" content={`${drops[0].collection.name}`} />
         <meta
           name="og:url"
-          content={`https://create.zora.co/editions/${collections[0].address}`}
+          content={`https://create.zora.co/editions/${drops[0].collection.address}`}
         />
         <meta
           name="og:description"
@@ -59,19 +60,26 @@ const HomePage: NextPage<HomePageProps> = ({ collections }) => {
         />
         <meta name="og:image" content={ogImage} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={`${collections[0].name}`} />
+        <meta name="twitter:title" content={`${drops[0].collection.name}`} />
         <meta
           name="twitter:url"
-          content={`https://create.zora.co/editions/${collections[0].address}`}
+          content={`https://create.zora.co/editions/${drops[0].collection.address}`}
         />
         <meta name="twitter:image" content={ogImage} />
       </Head>
 
-      <Stack align="center" minH="100vh">
-        {collections.map((collection) => (
-          <Collection key={collection.address} username={username} collection={collection} />
-        ))}
-      </Stack>
+
+        <Grid  columns={2} align="center" minH="100vh">
+          {drops.map((drop: Drop & {collection: SubgraphERC721Drop}) => {
+            return (
+              <a  key={drop.collection.address} href={`/drops/${drop.slug}`}>
+    
+              <CollectionImageInner collection={drop.collection}/>
+              </a>
+            )
+          })}
+        </Grid>
+
     </>
   )
 }
@@ -82,19 +90,41 @@ export const getServerSideProps: GetServerSideProps = async ({ res }) => {
 
   // get drops from backend
   const drops = await getAllDropsForHome({preview: false});
-  const collectionAddresses = drops.map((drop) => drop.contractAddress)
+  const collectionAddresses = drops.map((drop) => drop.contractAddress.toLowerCase())
+  const slugs = drops.map((drop) => drop.slug)
+
 
   const { erc721Drops } = await request(SUBGRAPH_URL, GET_COLLECTIONS_QUERY, {
     collectionAddresses: collectionAddresses,
   })
 
-  if (!erc721Drops.length) {
+
+const addys = erc721Drops.map(item => item.address)
+
+  const combinedDropsAndCollections = drops.map((drop) => {
+
+    console.log(drop.contractAddress);
+    return {
+      ...drop,
+      collection: erc721Drops.find(item => {
+
+        if (item.address === drop.contractAddress.toLowerCase()){
+          return true;
+        } 
+
+       })
+    }
+    });
+
+
+
+  if (!combinedDropsAndCollections.length) {
     res.statusCode = 404
   }
 
   return {
     props: {
-      collections: erc721Drops,
+      drops: combinedDropsAndCollections,
     },
   }
 }

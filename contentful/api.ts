@@ -14,7 +14,7 @@ const DROP_FIELDS = `
   accentColor
 `
 
-interface Drop {
+export interface Drop {
   contractAddress: string
   slug: string
   title: string
@@ -78,7 +78,7 @@ export async function getAllDropsForHome({preview}: {preview: boolean}) {
 
   const entries = await fetchGraphQL(
     `query {
-      dropCollection(preview: ${preview ? 'true' : 'false'}) {
+      dropCollection(order: date_DESC, preview: ${preview ? 'true' : 'false'}) {
         items {
           ${DROP_FIELDS}
         }
