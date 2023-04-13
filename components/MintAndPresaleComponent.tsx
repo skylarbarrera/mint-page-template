@@ -48,7 +48,7 @@ export function MintAndPresaleComponent({
         </Button>
       </Flex>
       <Box display={showPresale ? 'block' : 'none'}>
-        <PresaleComponent collection={collection} />
+        <PresaleComponent collection={collection} textColor={textColor} accentColor={accentColor}/>
       </Box>
       <Box display={!showPresale ? 'block' : 'none'}>
         <MintComponent collection={collection} textColor={textColor} accentColor={accentColor}/>

@@ -124,7 +124,7 @@ export function MintButton({
         style={
           isMinted
             ? { backgroundColor: vars.color.positive, color: vars.color.onPositive }
-            : {backgroundColor: 'yellow', color: accentColor}
+            : {backgroundColor: accentColor, color: 'purple'}
         }
         className={awaitingApproval ? waitingApproval : ''}
         disabled={
