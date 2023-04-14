@@ -96,7 +96,7 @@ export function CollectionInner({
               <MintAndPresaleComponent collection={collectionContext} textColor={textColor} accentColor={accentColor}/>
 
               <Box      style={assignInlineVars({ [collectionAccentColor]: 'pink' })}>
-                {true && (
+                {username && (
                   <Well borderColor={accentColor} style={{paddingLeft: 20, paddingRight: 20, padddingTop: 5, marginTop: 10, marginBottom: 10}}>
                     <Flex justify="space-between" align="center">
                       <Text fontSize={14} style={{color: textColor}}>Logged in as {username}</Text>
