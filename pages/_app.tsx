@@ -4,7 +4,7 @@ import 'styles/theme.css'
 import 'styles/global.css'
 
 import { SWRConfig } from 'swr'
-import { getDefaultWallets, RainbowKitProvider, lightTheme } from '@rainbow-me/rainbowkit'
+import { getDefaultWallets, RainbowKitProvider, darkTheme, midnightTheme } from '@rainbow-me/rainbowkit'
 import {  configureChains, createClient, WagmiConfig } from 'wagmi'
 import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { mainnet, goerli } from 'wagmi/chains'
@@ -38,9 +38,9 @@ function App({ Component, pageProps }) {
       <RainbowKitProvider
         chains={chains}
         modalSize="compact"
-        theme={lightTheme({
-          accentColor: 'black',
-          borderRadius: 'small',
+        theme={darkTheme({
+          // can we somehow share the accent color?
+          borderRadius: 'large',
         })}
       >
         <SWRConfig
