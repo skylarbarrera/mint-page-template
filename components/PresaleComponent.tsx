@@ -7,8 +7,12 @@ import { useAccount, useDisconnect } from 'wagmi'
 
 export function PresaleComponent({
   collection,
+  textColor,
+  accentColor,
 }: {
   collection: ERC721DropProviderState
+  textColor: string
+  accentColor: string
 }) {
   const { address } = useAccount()
   const { disconnect } = useDisconnect()
@@ -51,7 +55,7 @@ export function PresaleComponent({
             Connect wallet to access presale
           </Heading>
           <Flex mt="x4" w="100%" flexChildren>
-            <MintComponent presale collection={collection} showPrice={false} />
+            <MintComponent presale collection={collection} showPrice={false} textColor={textColor} accentColor={accentColor}/>
           </Flex>
         </Stack>
       ) : !accessAllowed ? (
@@ -77,7 +81,7 @@ export function PresaleComponent({
           </Flex>
         </Stack>
       ) : (
-        <MintComponent presale allowlistEntry={allowlistEntry} collection={collection} />
+        <MintComponent presale allowlistEntry={allowlistEntry} collection={collection} textColor={textColor} accentColor={accentColor}/>
       )}
     </Box>
   )

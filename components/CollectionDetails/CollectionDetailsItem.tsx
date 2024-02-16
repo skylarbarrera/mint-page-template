@@ -7,6 +7,7 @@ interface CollectionDetailsItemProps extends FlexProps {
   name: string
   value?: string
   href?: string
+  textColor?: string
   children?: ReactNode
 }
 export function CollectionDetailsItem({
@@ -14,6 +15,7 @@ export function CollectionDetailsItem({
   name,
   value,
   href,
+  textColor,
   ...props
 }: CollectionDetailsItemProps) {
   const Wrapper = href != null ? Link : (Fragment as any)
@@ -30,14 +32,14 @@ export function CollectionDetailsItem({
         aria-label="External link"
         {...props}
       >
-        <Paragraph size="sm" color="tertiary">
+        <Paragraph size="sm" style={{color: textColor}}>
           {name}
         </Paragraph>
 
         <Flex gap="x2" align="center">
-          {!!value && !href && <Paragraph size="sm">{value}</Paragraph>}
+          {!!value && !href && <Paragraph size="sm" style={{color: textColor}}>{value}</Paragraph>}
           {!!href && (
-            <Paragraph size="sm" className={trailingArrow}>
+            <Paragraph size="sm" className={trailingArrow} style={{color: textColor}}>
               {value || 'Explore'}
             </Paragraph>
           )}

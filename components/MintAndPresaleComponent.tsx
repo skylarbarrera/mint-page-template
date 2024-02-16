@@ -9,10 +9,14 @@ export function MintAndPresaleComponent({
   collection,
   className = '',
   showPresaleValue = true,
+  textColor,
+  accentColor
 }: {
   className?: BoxProps['className']
   showPresaleValue?: boolean
   collection: ERC721DropProviderState
+  textColor: string
+  accentColor: string
 }) {
   const { presaleExists, merkleRootExists, saleNotStarted, saleIsFinished } =
     useSaleStatus({
@@ -44,13 +48,13 @@ export function MintAndPresaleComponent({
         </Button>
       </Flex>
       <Box display={showPresale ? 'block' : 'none'}>
-        <PresaleComponent collection={collection} />
+        <PresaleComponent collection={collection} textColor={textColor} accentColor={accentColor}/>
       </Box>
       <Box display={!showPresale ? 'block' : 'none'}>
-        <MintComponent collection={collection} />
+        <MintComponent collection={collection} textColor={textColor} accentColor={accentColor}/>
       </Box>
     </Box>
   ) : (
-    <MintComponent className={className} collection={collection} />
+    <MintComponent className={className} collection={collection} textColor={textColor} accentColor={accentColor}/>
   )
 }

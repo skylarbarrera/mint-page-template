@@ -1,6 +1,7 @@
 import { MintButton } from './MintButton'
 import { Box, Button, Eyebrow, Flex, Heading, Stack, StackProps } from '@zoralabs/zord'
-import { OPEN_EDITION_SIZE } from 'constants/numbers'
+import { OPEN_EDITION_SIZE, ZORA_MINT_FEE } from 'constants/numbers'
+import { BigNumber } from 'ethers'
 import { useSaleStatus } from 'hooks/useSaleStatus'
 import { parseInt } from 'lodash'
 import { ERC721DropProviderState } from 'providers/ERC721DropProvider'
@@ -14,6 +15,8 @@ interface MintComponentProps extends StackProps {
   presale?: boolean
   showPrice?: boolean
   allowlistEntry?: AllowListEntry
+  textColor: string
+  accentColor: string
 }
 
 export function MintComponent({
@@ -22,6 +25,8 @@ export function MintComponent({
   presale = false,
   showPrice = true,
   allowlistEntry,
+  textColor,
+  accentColor,
   ...props
 }: MintComponentProps) {
   const { userMintedCount, totalMinted } = collection
@@ -37,7 +42,7 @@ export function MintComponent({
   const [isMinted, setIsMinted] = useState<boolean>(false)
   const [mintCounter, setMintCounter] = useState(1)
   const availableMints = maxPerWallet - (userMintedCount || 0)
-  const internalPrice = allowlistEntry?.price || collection.salesConfig.publicSalePrice
+  const internalPrice = BigNumber.from(allowlistEntry?.price || collection.salesConfig.publicSalePrice).add(ZORA_MINT_FEE)
   const availableTokenCount = collection.maxSupply - totalMinted
 
   function handleMintCounterUpdate(value: any) {
@@ -69,14 +74,11 @@ export function MintComponent({
       {showPrice && !saleIsFinished && !isSoldOut && (
         <Flex gap="x3" flexChildren justify="space-between" align="flex-end" wrap="wrap">
           <Stack gap="x1" style={{ flex: 'none' }}>
-            <Eyebrow>Price</Eyebrow>
-            <Heading size="sm" className={priceDateHeading}>
-              {internalPrice === '0'
-                ? 'Free'
-                : `${formatCryptoVal(Number(internalPrice) * (mintCounter || 1))} ETH`}
+            <Eyebrow style={{color: accentColor}}>Price</Eyebrow>
+            <Heading size="sm" className={priceDateHeading} style={{color: accentColor}}>
+              {`${formatCryptoVal(Number(internalPrice) * (mintCounter || 1))} ETH`}
             </Heading>
           </Stack>
-
           {saleIsActive && !isSoldOut ? (
             <Stack gap="x1" style={{ textAlign: 'right' }}>
               <Flex
@@ -127,8 +129,8 @@ export function MintComponent({
             </Stack>
           ) : saleIsFinished ? (
             <Stack gap="x1" style={{ flex: 'none' }}>
-              <Eyebrow>Sold</Eyebrow>
-              <Heading size="sm" className={priceDateHeading}>
+              <Eyebrow style={{color: accentColor}}>Sold</Eyebrow>
+              <Heading style={{color: accentColor}} size="sm" className={priceDateHeading}>
                 {formattedMintedCount}
                 {collection.maxSupply > OPEN_EDITION_SIZE ? (
                   ' NFTs'
@@ -155,6 +157,8 @@ export function MintComponent({
         setIsMinted={setIsMinted}
         allowlistEntry={allowlistEntry}
         availableMints={availableMints}
+        textColor={textColor}
+        accentColor={accentColor}
       />
     </Stack>
   )

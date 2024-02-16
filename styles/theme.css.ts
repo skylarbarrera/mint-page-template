@@ -1,13 +1,17 @@
 import { colorTheme, theme, border, radii, ease, size, space } from '@zoralabs/zord'
 import * as typography from './tokens/typography'
-import { createTheme, style } from '@vanilla-extract/css'
+import { createTheme, createThemeContract, createVar, style } from '@vanilla-extract/css'
+
+export const collectionAccentColor = createVar();
+export const collectionTextColor = createVar();
+
 
 // Valid colour values are short and long hex codes (#00ff00) (#f00)
 const { colors, shadows } = colorTheme({
   foreground: '#000',
-  background: '#fff',
-  accent: '#000',
-  positive: '#92ea22',
+  background: '#ffffff00',
+  accent: collectionAccentColor,
+  positive: collectionTextColor,
 })
 
 export const customTheme = createTheme(theme, {

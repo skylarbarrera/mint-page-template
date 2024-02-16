@@ -28,7 +28,7 @@ export const ConnectWallet = ({ connectText = 'Connect wallet', ...props }) => {
               }
               if (!mounted || !account || !chain) {
                 return (
-                  <Button size="sm" px="x4" onClick={openConnectModal} suppressHydrationWarning={true} {...props}>
+                  <Button size="sm" px="x4" onClick={openConnectModal} suppressHydrationWarning={true} style={{backgrouncColor: 'yellow'}}{...props}>
                     {connectText}
                   </Button>
                 )

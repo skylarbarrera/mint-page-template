@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown'
+import { assignInlineVars } from '@vanilla-extract/dynamic';
 import { maxWidth, wrapWords } from 'styles/styles.css'
 import { MintAndPresaleComponent } from '@components/MintAndPresaleComponent'
 import { MintDetails } from '@components/MintDetails'
@@ -10,19 +11,33 @@ import {
   vars,
   Box,
   Flex,
-  Well,
   Stack,
   Text,
   Button,
   Paragraph,
   SpinnerOG,
+  border,
 } from '@zoralabs/zord'
 import {CollectionMedia} from './CollectionMedia'
+import { collectionAccentColor } from 'styles/theme.css';
+
+const Well = ({borderColor, style, children}) => {
+
+  return (
+  <div style={{borderColor: borderColor, borderWidth: 2 ,borderStyle: 'solid', borderRadius: 30, ...style}}>
+  {children}
+  </div>
+  );
+}
 
 export function CollectionInner({
   username,
+  textColor,
+  accentColor
 }: {
   username?: string
+  textColor?: string
+  accentColor?: string
 }) {
   const collectionContext = useERC721DropContract()
   const { metadata } = useCollectionMetadata(
@@ -45,18 +60,18 @@ export function CollectionInner({
       mt="x3"
       align="center"
       direction={{ '@initial': 'column', '@768': 'row-reverse' }}
-      gap="x3"
+      gap="x1"
       p={{ '@initial': 'x1', '@576': 'x10' }}
       w="100%"
-      style={{ maxWidth: 1360, margin: 'auto', minHeight: '80vh' }}
+      //style={[{ maxWidth: 1360, margin: 'auto', minHeight: '80vh' }]}
+      style={assignInlineVars({ [collectionAccentColor]: 'pink' })}
     >
-      <Flex flex={{ '@initial': '1', '@1024': '1' }} p="x2" justify="center">
+      <Flex flex={{ '@initial': '1', '@1024': '1' }}  justify="center">
         <Box position="relative" w="100%"
           className={styles.mediaContainer}
         >
             <CollectionMedia
               className={styles.mediaItem}
-              h="100%"
               metadata={metadataDetails}
               borderRadius="curved"
               objectFit="cover"
@@ -67,10 +82,10 @@ export function CollectionInner({
       </Flex>
       <Box flex={{ '@initial': '1', '@1024': 'none' }} className={maxWidth} p="x4">
         <Stack gap="x2" mb="x3">
-          <Text variant="display-md" mb="x2">
+          <Text variant="display-md" mb="x2" style={{color: accentColor}}>
             {collectionContext.name}
           </Text>
-          <Paragraph className={wrapWords} mb="x2">
+          <Paragraph className={wrapWords} mb="x2" style={{color: textColor, opacity: '80%'}}>
             <ReactMarkdown>{description}</ReactMarkdown>
           </Paragraph>
         </Stack>
@@ -78,13 +93,13 @@ export function CollectionInner({
         <Box>
           {collectionContext != null ? (
             <>
-              <MintAndPresaleComponent collection={collectionContext} />
+              <MintAndPresaleComponent collection={collectionContext} textColor={textColor} accentColor={accentColor}/>
 
-              <Box>
+              <Box      style={assignInlineVars({ [collectionAccentColor]: 'pink' })}>
                 {username && (
-                  <Well borderColor="accent" py="x1" mt="x4">
+                  <Well borderColor={accentColor} style={{paddingLeft: 20, paddingRight: 20, padddingTop: 5, marginTop: 10, marginBottom: 10}}>
                     <Flex justify="space-between" align="center">
-                      <Text fontSize={14}>Logged in as {username}</Text>
+                      <Text fontSize={14} style={{color: textColor}}>Logged in as {username}</Text>
                       <Button
                         pill
                         variant="ghost"
@@ -92,7 +107,8 @@ export function CollectionInner({
                         positive="relative"
                         style={{ left: vars.space.x5 }}
                       >
-                        <Box as="span" fontSize={14}>
+                        {/* need an on hover */}
+                        <Box as="span" fontSize={14} style={{color: textColor}}>
                           Disconnect
                         </Box>
                       </Button>
@@ -100,8 +116,8 @@ export function CollectionInner({
                   </Well>
                 )}
               </Box>
-              <Well borderColor="accent" fontSize={14} mt="x4">
-                <MintDetails collection={collectionContext} hideToggle={true} />
+              <Well borderColor={accentColor} style={{paddingLeft: 20, paddingRight: 20, padddingTop: 10, marginTop: 20, marginBottom: 20}}>
+                <MintDetails collection={collectionContext} hideToggle={true} accentColor={accentColor} textColor={textColor}/>
               </Well>
             </>
           ) : (
